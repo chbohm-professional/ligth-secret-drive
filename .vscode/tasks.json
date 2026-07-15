@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "node --inspect=9229 -r ts-node/register ${relativeFile}",
+			"windows": {
+				"command": "node --inspect=9229 -r ts-node/register ${relativeFile}"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$tsc"
+			],
+			"label": "Debug current file",
+		},
+		{
+			"type": "shell",
+			"command": "ts-node ${relativeFile}",
+			"windows": {
+				"command": "ts-node ${relativeFile}"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$tsc"
+			],
+			"label": "Run current file",
+		}
+		
+	]
+}

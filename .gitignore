@@ -1,0 +1,9 @@
+node_modules
+/lib
+
+# logs
+
+# test
+
+
+var/**/*.*

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault — Unlock</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="auth-page">
+    <div class="auth-card" id="unlockCard">
+        <div class="auth-logo" id="authLogo">🔐</div>
+        <h1 class="auth-title" id="authTitle">Unlock Vault</h1>
+        <p class="auth-subtitle" id="authSubtitle">Enter your master password to unlock your locally encrypted vault.</p>
+
+        <form id="unlockForm" class="auth-form">
+            <div class="form-group">
+                <label for="password">Master Password</label>
+                <input type="password" id="password" name="password" autocomplete="current-password"
+                       placeholder="Enter master password" required autofocus>
+            </div>
+            <!-- Only shown when action=init -->
+            <div class="form-group" id="confirmGroup" style="display:none">
+                <label for="confirm">Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" autocomplete="new-password"
+                       placeholder="Confirm master password">
+            </div>
+            <div id="formError" class="form-error" style="display:none"></div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Unlock</button>
+        </form>
+        <div class="auth-links">
+            <a href="#" id="logoutLink">Use a different local profile</a>
+        </div>
+    </div>
+    <script src="/js/app-config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/unlock.js"></script>
+</body>
+</html>

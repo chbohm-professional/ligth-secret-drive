@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault — Explorer</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="explorer-page">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <span class="header-logo">🔒</span>
+            <span class="header-title">Encrypted Vault</span>
+        </div>
+        <div class="header-toolbar">
+            <button class="toolbar-btn" id="btnUpload" title="Upload files">
+                ⬆ Upload
+            </button>
+            <button class="toolbar-btn" id="btnNewFolder" title="Create folder">
+                📁 New Folder
+            </button>
+            <button class="toolbar-btn" id="btnNewDoc" title="Create text document">
+                📝 New Document
+            </button>
+            <button class="toolbar-btn" id="btnDownload" title="Download selected" disabled>
+                ⬇ Download
+            </button>
+            <button class="toolbar-btn btn-danger" id="btnDelete" title="Delete selected" disabled>
+                🗑 Delete
+            </button>
+        </div>
+        <div class="header-right">
+            <span id="userEmail" class="user-email"></span>
+            <button class="toolbar-btn" id="btnLock" title="Lock vault">🔒 Lock</button>
+            <button class="toolbar-btn" id="btnLogout" title="Sign out">Sign out</button>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" id="breadcrumb">
+        <span class="breadcrumb-item active" data-id="null">Root</span>
+    </div>
+
+    <!-- Main layout -->
+    <div class="explorer-layout">
+
+        <!-- Sidebar: folder tree -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">Folders</div>
+            <div class="tree-container" id="folderTree"></div>
+        </aside>
+
+        <!-- Content: file list -->
+        <main class="content" id="content">
+            <table class="file-table" id="fileTable">
+                <thead>
+                    <tr>
+                        <th class="col-check"><input type="checkbox" id="selectAll"></th>
+                        <th class="col-name">Name</th>
+                        <th class="col-size">Size</th>
+                        <th class="col-date">Modified</th>
+                        <th class="col-type">Type</th>
+                    </tr>
+                </thead>
+                <tbody id="fileList">
+                    <tr class="empty-row"><td colspan="5">Loading…</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Status bar -->
+    <footer class="status-bar">
+        <span id="statusText">Ready</span>
+        <span id="selectionInfo"></span>
+    </footer>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu" style="display:none">
+        <div class="menu-item" data-action="open">📂 Open</div>
+        <div class="menu-item" data-action="download">⬇ Download</div>
+        <div class="menu-item" data-action="rename">✏ Rename</div>
+        <div class="menu-item" data-action="move">✂ Move to…</div>
+        <div class="menu-item" data-action="copy">📋 Copy to…</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item menu-danger" data-action="delete">🗑 Delete</div>
+    </div>
+
+    <!-- Upload input (hidden) -->
+    <input type="file" id="fileInput" multiple style="display:none">
+
+    <!-- Dialogs -->
+    <div class="modal-overlay" id="modalOverlay" style="display:none">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <span id="modalTitle">Dialog</span>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <script src="/js/app-config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/dialogs.js"></script>
+    <script src="/js/folders.js"></script>
+    <script src="/js/files.js"></script>
+    <script src="/js/upload.js"></script>
+    <script src="/js/explorer.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "command": "npm run deps",
+            "name": "Run deps",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal"
+        },
+        {
+            "command": "npm run debug",
+            "name": "Debug Backend LOCAL",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal"
+        },
+        {
+            "command": "npm run debug-qa",
+            "name": "Debug Backend QA",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal"
+        },
+        {
+            "command": "npm run build",
+            "name": "Build",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal"
+        },
+        {
+            "command": "npm run test",
+            "name": "Run Tests",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal"
+        },
+        {
+            "command": "npm run testCurrentFile -- ${file}",
+            "name": "Run Test",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal"
+        },
+        {
+            "command": "node --inspect=9229 -r ts-node/register ${relativeFile}",
+            "name": "Debug current file",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal",
+            //"preLaunchTask": "Debug current file"
+        },
+        {
+            "command": "node -r ts-node/register ${relativeFile}",
+            "name": "Run current file",
+            "request": "launch",
+            "trace": true,
+            "type": "node-terminal",
+            //"preLaunchTask": "Debug current file"
+        }
+    ]
+}
