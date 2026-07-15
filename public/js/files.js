@@ -9,75 +9,143 @@ const Files = (() => {
     async function loadFiles(folderId) {
         _currentFolderId = folderId;
         _selected.clear();
-        const res = await API.listFiles(folderId);
-        _files = res.data;
+        const [foldersRes, filesRes] = await Promise.all([
+            API.listFolders(folderId),
+            API.listFiles(folderId),
+        ]);
+        const folders = foldersRes.data.map(f => ({ ...f, type: 'folder' }));
+        const files = filesRes.data.map(f => ({ ...f, type: 'file' }));
+        _files = [...folders, ...files].sort((a, b) => {
+            if (a.type !== b.type) return a.type === 'folder' ? -1 : 1;
+            return a.name.localeCompare(b.name);
+        });
         renderFiles();
         updateToolbar();
         return _files;
     }
 
     function renderFiles() {
-        const tbody = document.getElementById('fileList');
-        if (!tbody) return;
+        const list = document.getElementById('fileList');
+        if (!list) return;
 
         if (_files.length === 0) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="5">This folder is empty</td></tr>';
+            list.innerHTML = '<div class="empty-row">Esta carpeta está vacía</div>';
             return;
         }
 
-        tbody.innerHTML = _files.map(f => `
-            <tr class="file-row ${_selected.has(f.id) ? 'selected' : ''}"
-                data-id="${f.id}" data-name="${escHtml(f.name)}"
-                data-type="file" draggable="true">
-                <td class="col-check"><input type="checkbox" data-id="${f.id}" ${_selected.has(f.id) ? 'checked' : ''}></td>
-                <td class="col-name"><div class="file-name-cell">
-                    <span class="file-icon">${fileIcon(f.mimeType, f.name)}</span>
-                    <span>${escHtml(f.name)}</span>
-                </div></td>
-                <td class="col-size">${formatSize(f.size)}</td>
-                <td class="col-date">${formatDate(f.createdAt)}</td>
-                <td class="col-type">${fileType(f.mimeType, f.name)}</td>
-            </tr>`).join('');
+        list.innerHTML = _files.map(item => {
+            const selectedClass = _selected.has(item.id) ? 'selected' : '';
+            const isFolder = item.type === 'folder';
+            const sizeLabel = isFolder ? `${getFolderCount(item.id)} elem.` : formatSize(item.size);
+            const dateLabel = formatDate(item.updatedAt || item.createdAt);
+            const icon = isFolder ? '📁' : fileIcon(item.mimeType, item.name);
+            return `<div class="file-item ${selectedClass}" data-id="${item.id}" data-type="${item.type}" data-name="${escHtml(item.name)}" draggable="true">
+                <div class="file-item-icon">${icon}</div>
+                <div class="file-item-name">
+                    <span>${escHtml(item.name)}</span>
+                </div>
+                <div class="file-item-size">${sizeLabel}</div>
+                <div class="file-item-date">${dateLabel}</div>
+                <button type="button" class="file-action-button" aria-label="Más opciones">⋮</button>
+            </div>`;
+        }).join('');
 
-        // Events
-        tbody.querySelectorAll('.file-row').forEach(row => {
-            row.addEventListener('click', (e) => {
-                if (e.target.type === 'checkbox') return;
-                if (e.ctrlKey || e.metaKey) {
-                    toggleSelect(row.dataset.id);
+        list.querySelectorAll('.file-item').forEach(item => {
+            const id = item.dataset.id;
+            const type = item.dataset.type;
+            const actionButton = item.querySelector('.file-action-button');
+            let longPressTimer = null;
+
+            const selectItem = (toggle = false) => {
+                if (toggle) {
+                    toggleSelect(id);
                 } else {
                     _selected.clear();
-                    toggleSelect(row.dataset.id);
+                    _selected.add(id);
                 }
                 renderFiles();
                 updateToolbar();
+            };
+
+            const openItem = () => {
+                const entry = _files.find(f => f.id === id);
+                if (!entry) return;
+                if (entry.type === 'folder') {
+                    Folders.selectFolder(entry.id);
+                } else {
+                    if (isEditableFile(entry)) {
+                        window.location.href = `/editor.html?id=${encodeURIComponent(entry.id)}&name=${encodeURIComponent(entry.name)}`;
+                    } else {
+                        _selected.clear();
+                        _selected.add(entry.id);
+                        downloadSelected();
+                    }
+                }
+            };
+
+            item.addEventListener('click', (e) => {
+                if (e.target === actionButton) return;
+                if (e.ctrlKey || e.metaKey) {
+                    selectItem(true);
+                } else {
+                    selectItem(false);
+                }
             });
-            row.querySelector('input[type=checkbox]').addEventListener('change', (e) => {
-                if (e.target.checked) _selected.add(row.dataset.id);
-                else _selected.delete(row.dataset.id);
-                updateToolbar();
-            });
-            row.addEventListener('contextmenu', (e) => {
+
+            item.addEventListener('dblclick', () => openItem());
+
+            item.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                if (!_selected.has(row.dataset.id)) {
+                if (!_selected.has(id)) {
                     _selected.clear();
-                    _selected.add(row.dataset.id);
+                    _selected.add(id);
                     renderFiles();
                 }
                 showContextMenu(e.clientX, e.clientY);
             });
-            row.addEventListener('dblclick', () => {
-                const file = _files.find(f => f.id === row.dataset.id);
-                if (!file) return;
-                if (isEditableFile(file)) {
-                    window.location.href = `/editor.html?id=${encodeURIComponent(file.id)}&name=${encodeURIComponent(file.name)}`;
-                } else {
-                    downloadSelected();
+
+            item.addEventListener('touchstart', () => {
+                longPressTimer = window.setTimeout(() => {
+                    toggleSelect(id);
+                    renderFiles();
+                    updateToolbar();
+                }, 550);
+            });
+            item.addEventListener('touchend', () => {
+                if (longPressTimer) window.clearTimeout(longPressTimer);
+            });
+            item.addEventListener('touchcancel', () => {
+                if (longPressTimer) window.clearTimeout(longPressTimer);
+            });
+
+            actionButton?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!_selected.has(id)) {
+                    _selected.clear();
+                    _selected.add(id);
+                    renderFiles();
+                    updateToolbar();
                 }
+                const rect = actionButton.getBoundingClientRect();
+                showContextMenu(rect.right - 8, rect.bottom + 4);
             });
         });
+    }
 
-        document.getElementById('selectAll').checked = false;
+    function getFolderCount(folderId) {
+        const tree = Folders.getTree();
+        if (!tree) return 0;
+        const node = findFolderNode(tree, folderId);
+        return node ? ((node.subfolders?.length || 0) + (node.files?.length || 0)) : 0;
+    }
+
+    function findFolderNode(node, targetId) {
+        if ((node.id === null ? null : node.id) === targetId) return node;
+        for (const child of (node.subfolders || [])) {
+            const found = findFolderNode(child, targetId);
+            if (found) return found;
+        }
+        return null;
     }
 
     function toggleSelect(id) {
@@ -92,7 +160,7 @@ const Files = (() => {
         if (dlBtn) dlBtn.disabled = count === 0;
         if (delBtn) delBtn.disabled = count === 0;
         const info = document.getElementById('selectionInfo');
-        if (info) info.textContent = count > 0 ? `${count} item(s) selected` : '';
+        if (info) info.textContent = count > 0 ? `${count} elemento${count === 1 ? '' : 's'} seleccionado${count === 1 ? '' : 's'}` : '';
     }
 
     function showContextMenu(x, y) {
@@ -114,14 +182,14 @@ const Files = (() => {
                 a.href = url; a.download = file.name; a.click();
                 setTimeout(() => URL.revokeObjectURL(url), 3000);
             } catch (err) {
-                alert(`Download failed: ${err.message}`);
+                alert(`Error al descargar: ${err.message}`);
             }
         }
     }
 
     async function deleteSelected() {
         if (_selected.size === 0) return;
-        const ok = await Dialogs.confirm('Delete Files', `Delete ${_selected.size} item(s)? This cannot be undone.`);
+        const ok = await Dialogs.confirm('Eliminar archivos', `Eliminar ${_selected.size} elemento(s)? Esto no se puede deshacer.`);
         if (!ok) return;
         for (const id of [..._selected]) {
             try {
@@ -129,24 +197,24 @@ const Files = (() => {
                 _files = _files.filter(f => f.id !== id);
                 _selected.delete(id);
             } catch (err) {
-                alert(`Error deleting file: ${err.message}`);
+                alert(`Error eliminando archivo: ${err.message}`);
             }
         }
         renderFiles();
         updateToolbar();
-        status('Items deleted.');
+        status('Elementos eliminados.');
     }
 
     async function renameSelected() {
         if (_selected.size !== 1) return;
         const [id] = [..._selected];
         const file = _files.find(f => f.id === id);
-        const newName = await Dialogs.prompt('Rename', 'New name', file.name);
+        const newName = await Dialogs.prompt('Cambiar nombre', 'Nuevo nombre', file.name);
         if (!newName || newName === file.name) return;
         try {
             await API.renameFile(id, newName);
             await loadFiles(_currentFolderId);
-        } catch (err) { alert(err.message); }
+        } catch (err) { alert(`Error al renombrar: ${err.message}`); }
     }
 
     async function moveSelected() {
@@ -165,17 +233,33 @@ const Files = (() => {
         if (_selected.size !== 1) return;
         const [id] = [..._selected];
         const tree = Folders.getTree();
-        const targetId = await Dialogs.pickFolder('Copy to…', tree, _currentFolderId);
+        const targetId = await Dialogs.pickFolder('Copiar a…', tree, _currentFolderId);
         if (targetId === undefined) return;
         try {
             await API.copyFile(id, targetId);
             await loadFiles(_currentFolderId);
-        } catch (err) { alert(err.message); }
+        } catch (err) { alert(`Error al copiar: ${err.message}`); }
     }
 
     function status(msg) {
         const el = document.getElementById('statusText');
         if (el) el.textContent = msg;
+    }
+
+    async function openSelected() {
+        if (_selected.size !== 1) return;
+        const [id] = [..._selected];
+        const entry = _files.find(f => f.id === id);
+        if (!entry) return;
+        if (entry.type === 'folder') {
+            Folders.selectFolder(entry.id);
+        } else {
+            if (isEditableFile(entry)) {
+                window.location.href = `/editor.html?id=${encodeURIComponent(entry.id)}&name=${encodeURIComponent(entry.name)}`;
+            } else {
+                downloadSelected();
+            }
+        }
     }
 
     // Helpers
@@ -226,5 +310,5 @@ const Files = (() => {
         return false;
     }
 
-    return { loadFiles, downloadSelected, deleteSelected, renameSelected, moveSelected, copySelected, getSelected: () => _selected };
+    return { loadFiles, downloadSelected, deleteSelected, renameSelected, moveSelected, copySelected, openSelected, getSelected: () => _selected };
 })();

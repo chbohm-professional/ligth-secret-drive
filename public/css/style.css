@@ -208,39 +208,43 @@ body {
 .tree-icon { flex-shrink: 0; }
 .tree-label { overflow: hidden; text-overflow: ellipsis; }
 
-.content { flex: 1; overflow: auto; background: var(--bg); }
+.content { flex: 1; overflow: auto; background: var(--bg); padding: 16px; }
 
-/* ── File table ─────────────────────────────────────────────────── */
-.file-table { width: 100%; border-collapse: collapse; }
-.file-table th {
-    text-align: left;
-    padding: 8px 12px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
+.file-list { display: grid; gap: 8px; width: 100%; }
+.file-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
     background: var(--bg-2);
-    position: sticky;
-    top: 0;
-    z-index: 1;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    min-height: 56px;
 }
-.file-table td { padding: 8px 12px; border-bottom: 1px solid rgba(42,42,74,0.5); }
-.file-table tr.file-row { cursor: pointer; transition: background 0.1s; }
-.file-table tr.file-row:hover { background: var(--hover); }
-.file-table tr.file-row.selected { background: var(--selected); }
-
-.col-check { width: 36px; }
-.col-name { min-width: 200px; }
-.col-size { width: 90px; color: var(--text-dim); text-align: right; }
-.col-date { width: 160px; color: var(--text-dim); }
-.col-type { width: 100px; color: var(--text-dim); }
-
-.file-name-cell { display: flex; align-items: center; gap: 8px; }
-.file-icon { font-size: 16px; flex-shrink: 0; }
-
-.empty-row td { text-align: center; color: var(--text-dim); padding: 48px; }
+.file-item:hover { background: var(--hover); }
+.file-item.selected { background: var(--selected); border-color: var(--accent); }
+.file-item-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.file-item-name { overflow: hidden; }
+.file-item-name span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-item-size,
+.file-item-date { color: var(--text-dim); font-size: 13px; white-space: nowrap; }
+.file-item-size { text-align: right; }
+.file-item-date { text-align: right; }
+.file-action-button {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+}
+.file-action-button:hover { background: rgba(255,255,255,0.08); }
+.empty-row { padding: 48px 16px; text-align: center; color: var(--text-dim); }
 
 /* ── Status bar ─────────────────────────────────────────────────── */
 .status-bar {

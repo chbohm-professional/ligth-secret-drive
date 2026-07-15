@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vault — Explorer</title>
+    <title>Vault — Explorador</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -13,80 +13,64 @@
     <header class="header">
         <div class="header-left">
             <span class="header-logo">🔒</span>
-            <span class="header-title">Encrypted Vault</span>
+            <span class="header-title">Vault cifrado</span>
         </div>
         <div class="header-toolbar">
-            <button class="toolbar-btn" id="btnUpload" title="Upload files">
-                ⬆ Upload
+            <button class="toolbar-btn" id="btnFolders" title="Seleccionar carpeta">
+                🗂 Carpetas
             </button>
-            <button class="toolbar-btn" id="btnNewFolder" title="Create folder">
-                📁 New Folder
+            <button class="toolbar-btn" id="btnUpload" title="Subir archivos">
+                ⬆ Subir
             </button>
-            <button class="toolbar-btn" id="btnNewDoc" title="Create text document">
-                📝 New Document
+            <button class="toolbar-btn" id="btnNewFolder" title="Crear carpeta">
+                📁 Nueva carpeta
             </button>
-            <button class="toolbar-btn" id="btnDownload" title="Download selected" disabled>
-                ⬇ Download
+            <button class="toolbar-btn" id="btnNewDoc" title="Crear documento">
+                📝 Nuevo documento
             </button>
-            <button class="toolbar-btn btn-danger" id="btnDelete" title="Delete selected" disabled>
-                🗑 Delete
+            <button class="toolbar-btn" id="btnDownload" title="Descargar seleccionados" disabled>
+                ⬇ Descargar
+            </button>
+            <button class="toolbar-btn btn-danger" id="btnDelete" title="Eliminar seleccionados" disabled>
+                🗑 Eliminar
             </button>
         </div>
         <div class="header-right">
             <span id="userEmail" class="user-email"></span>
-            <button class="toolbar-btn" id="btnLock" title="Lock vault">🔒 Lock</button>
-            <button class="toolbar-btn" id="btnLogout" title="Sign out">Sign out</button>
+            <button class="toolbar-btn" id="btnLock" title="Bloquear">🔒 Bloquear</button>
+            <button class="toolbar-btn" id="btnLogout" title="Salir">Salir</button>
         </div>
     </header>
 
     <!-- Breadcrumb -->
     <div class="breadcrumb" id="breadcrumb">
-        <span class="breadcrumb-item active" data-id="null">Root</span>
+        <span class="breadcrumb-item active" data-id="null">Inicio</span>
     </div>
 
     <!-- Main layout -->
     <div class="explorer-layout">
-
-        <!-- Sidebar: folder tree -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">Folders</div>
-            <div class="tree-container" id="folderTree"></div>
-        </aside>
-
-        <!-- Content: file list -->
         <main class="content" id="content">
-            <table class="file-table" id="fileTable">
-                <thead>
-                    <tr>
-                        <th class="col-check"><input type="checkbox" id="selectAll"></th>
-                        <th class="col-name">Name</th>
-                        <th class="col-size">Size</th>
-                        <th class="col-date">Modified</th>
-                        <th class="col-type">Type</th>
-                    </tr>
-                </thead>
-                <tbody id="fileList">
-                    <tr class="empty-row"><td colspan="5">Loading…</td></tr>
-                </tbody>
-            </table>
+            <div class="file-list" id="fileList">
+                <div class="empty-row">Cargando…</div>
+            </div>
         </main>
     </div>
 
     <!-- Status bar -->
     <footer class="status-bar">
-        <span id="statusText">Ready</span>
+        <span id="statusText">Listo</span>
         <span id="selectionInfo"></span>
     </footer>
 
     <!-- Context Menu -->
     <div class="context-menu" id="contextMenu" style="display:none">
-        <div class="menu-item" data-action="open">📂 Open</div>
-        <div class="menu-item" data-action="download">⬇ Download</div>
-        <div class="menu-item" data-action="rename">✏ Rename</div>
-        <div class="menu-item" data-action="move">✂ Move to…</div>
-        <div class="menu-item" data-action="copy">📋 Copy to…</div>
+        <div class="menu-item" data-action="open">📂 Abrir</div>
+        <div class="menu-item" data-action="download">⬇ Descargar</div>
+        <div class="menu-item" data-action="rename">✏ Cambiar nombre</div>
+        <div class="menu-item" data-action="move">✂ Mover a…</div>
+        <div class="menu-item" data-action="copy">📋 Copiar a…</div>
         <div class="menu-separator"></div>
-        <div class="menu-item menu-danger" data-action="delete">🗑 Delete</div>
+        <div class="menu-item menu-danger" data-action="delete">🗑 Eliminar</div>
     </div>
 
     <!-- Upload input (hidden) -->

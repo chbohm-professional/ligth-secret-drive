@@ -31,11 +31,11 @@
         const crumbEl = document.getElementById('breadcrumb');
         if (!crumbEl) return;
         const tree = Folders.getTree();
-        const path = [{ id: null, name: 'Root' }];
+        const path = [{ id: null, name: 'Inicio' }];
         findPath(tree, targetId, path);
         crumbEl.innerHTML = path.map((p, i) => {
             const isLast = i === path.length - 1;
-            return `${i > 0 ? '<span class="breadcrumb-sep">›</span>' : ''}
+            return `${i > 0 ? '<span class="breadcrumb-sep">/</span>' : ''}
                 <span class="breadcrumb-item ${isLast ? 'active' : ''}" data-id="${p.id === null ? 'null' : p.id}">${p.name}</span>`;
         }).join('');
         crumbEl.querySelectorAll('.breadcrumb-item:not(.active)').forEach(el => {
@@ -57,6 +57,14 @@
     }
 
     // ── Toolbar buttons ────────────────────────────────────────────────────
+    document.getElementById('btnFolders')?.addEventListener('click', async () => {
+        const tree = Folders.getTree();
+        const targetId = await Dialogs.pickFolder('Seleccionar carpeta', tree, currentFolderId);
+        if (targetId === undefined) return;
+        currentFolderId = targetId;
+        Folders.selectFolder(targetId);
+    });
+
     document.getElementById('btnUpload')?.addEventListener('click', () => {
         document.getElementById('fileInput').click();
     });
@@ -70,16 +78,16 @@
     });
 
     document.getElementById('btnNewFolder')?.addEventListener('click', async () => {
-        const name = await Dialogs.prompt('New Folder', 'Folder name', 'New Folder');
+        const name = await Dialogs.prompt('Nueva carpeta', 'Nombre de carpeta', 'Nueva carpeta');
         if (!name) return;
         try {
             await Folders.createFolder(currentFolderId, name);
-            status(`Folder "${name}" created.`);
+            status(`Carpeta "${name}" creada.`);
         } catch (err) { alert(err.message); }
     });
 
     document.getElementById('btnNewDoc')?.addEventListener('click', async () => {
-        const name = await Dialogs.prompt('New Document', 'Document name', 'Untitled.html');
+        const name = await Dialogs.prompt('Nuevo documento', 'Nombre del documento', 'Untitled.html');
         if (!name) return;
         try {
             const res = await API.createTextFile(name, currentFolderId);
@@ -101,13 +109,6 @@
         window.location.href = '/login.html';
     });
 
-    document.getElementById('selectAll')?.addEventListener('change', (e) => {
-        document.querySelectorAll('#fileList input[type=checkbox]').forEach(cb => {
-            cb.checked = e.target.checked;
-            cb.dispatchEvent(new Event('change'));
-        });
-    });
-
     // ── Context menu ───────────────────────────────────────────────────────
     document.addEventListener('click', () => {
         document.getElementById('contextMenu').style.display = 'none';
@@ -116,6 +117,7 @@
     document.getElementById('contextMenu')?.addEventListener('click', (e) => {
         const action = e.target.dataset.action;
         document.getElementById('contextMenu').style.display = 'none';
+        if (action === 'open') Files.openSelected();
         if (action === 'download') Files.downloadSelected();
         if (action === 'delete') Files.deleteSelected();
         if (action === 'rename') Files.renameSelected();
@@ -136,6 +138,6 @@
 
     function status(msg) {
         const el = document.getElementById('statusText');
-        if (el) el.textContent = msg || 'Ready';
+        if (el) el.textContent = msg || 'Listo';
     }
 })();

@@ -10,29 +10,32 @@ const Dialogs = (() => {
     const closeBtn = document.getElementById('modalClose');
 
     let _resolveClose = null;
+    let _cancelValue = null;
 
-    function open(title, bodyHtml, footerHtml) {
+    function open(title, bodyHtml, footerHtml, options = {}) {
         titleEl.textContent = title;
         bodyEl.innerHTML = bodyHtml;
         footerEl.innerHTML = footerHtml;
         overlay.style.display = 'flex';
+        _cancelValue = options.cancelValue === undefined ? null : options.cancelValue;
         return new Promise((resolve) => { _resolveClose = resolve; });
     }
 
     function close(value) {
         overlay.style.display = 'none';
-        if (_resolveClose) { _resolveClose(value); _resolveClose = null; }
+        const resolved = value === undefined ? _cancelValue : value;
+        if (_resolveClose) { _resolveClose(resolved); _resolveClose = null; }
     }
 
-    closeBtn?.addEventListener('click', () => close(null));
-    overlay?.addEventListener('click', (e) => { if (e.target === overlay) close(null); });
+    closeBtn?.addEventListener('click', () => close(undefined));
+    overlay?.addEventListener('click', (e) => { if (e.target === overlay) close(undefined); });
 
     /** Prompt dialog — returns the entered string or null */
     async function prompt(title, label, defaultValue = '') {
         const html = `<div class="form-group"><label>${label}</label>
             <input type="text" id="dlgInput" value="${defaultValue}" style="width:100%"></div>`;
-        const footer = `<button class="btn-secondary" onclick="Dialogs.close(null)">Cancel</button>
-            <button class="btn-confirm" id="dlgOk">OK</button>`;
+        const footer = `<button class="btn-secondary" onclick="Dialogs.close(null)">Cancelar</button>
+            <button class="btn-confirm" id="dlgOk">Aceptar</button>`;
 
         open(title, html, footer);
         const input = document.getElementById('dlgInput');
@@ -54,26 +57,32 @@ const Dialogs = (() => {
 
     /** Confirm dialog — returns true/false */
     async function confirm(title, message) {
-        const footer = `<button class="btn-secondary" onclick="Dialogs.close(false)">Cancel</button>
-            <button class="btn-confirm" style="background:var(--danger)" onclick="Dialogs.close(true)">Delete</button>`;
+        const footer = `<button class="btn-secondary" onclick="Dialogs.close(false)">Cancelar</button>
+            <button class="btn-confirm" style="background:var(--danger)" onclick="Dialogs.close(true)">Eliminar</button>`;
         return open(title, `<p>${message}</p>`, footer);
     }
 
     /** Folder picker — returns folderId or null */
     async function pickFolder(title, tree, currentFolderId) {
-        const items = flattenFolders(tree, 0);
-        const listHtml = `<div class="folder-picker" id="folderPickerList">
-            <div class="folder-picker-item ${!currentFolderId ? 'selected' : ''}" data-id="">
-                📁 Root
-            </div>
-            ${items.map(f => `<div class="folder-picker-item ${f.id === currentFolderId ? 'selected' : ''}" data-id="${f.id}">
-                ${'&nbsp;'.repeat(f.depth * 4)}📁 ${f.name}
-            </div>`).join('')}
-        </div>`;
-        const footer = `<button class="btn-secondary" onclick="Dialogs.close(null)">Cancel</button>
-            <button class="btn-confirm" id="dlgPickOk">Select</button>`;
+        function renderNode(node, depth) {
+            const id = node.id === null ? '' : node.id;
+            const isSelected = node.id === currentFolderId;
+            const indent = depth * 16;
+            const name = node.id === null ? 'Inicio' : node.name;
+            const children = (node.subfolders || []).map((child) => renderNode(child, depth + 1)).join('');
+            return `<div class="folder-picker-item ${isSelected ? 'selected' : ''}" data-id="${id}" style="padding-left:${12 + indent}px">
+                <span class="folder-picker-icon">📁</span>
+                <span class="folder-picker-label">${escHtml(name)}</span>
+            </div>${children}`;
+        }
 
-        open(title, listHtml, footer);
+        const listHtml = `<div class="folder-picker" id="folderPickerList">
+            ${renderNode(tree, 0)}
+        </div>`;
+        const footer = `<button class="btn-secondary" onclick="Dialogs.close(undefined)">Cancelar</button>
+            <button class="btn-confirm" id="dlgPickOk">Seleccionar</button>`;
+
+        open(title, listHtml, footer, { cancelValue: undefined });
 
         let selected = currentFolderId || null;
         document.querySelectorAll('.folder-picker-item').forEach(el => {
@@ -86,7 +95,11 @@ const Dialogs = (() => {
 
         return new Promise((resolve) => {
             document.getElementById('dlgPickOk').onclick = () => { close(selected); resolve(selected); };
-            _resolveClose = (v) => resolve(v);
+            const previousResolve = _resolveClose;
+            _resolveClose = (v) => {
+                resolve(v);
+                if (previousResolve) previousResolve(v);
+            };
         });
     }
 

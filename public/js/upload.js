@@ -8,18 +8,18 @@ const Upload = (() => {
         let done = 0;
 
         for (const file of fileList) {
-            if (status) status.textContent = `Uploading ${file.name}… (${done + 1}/${total})`;
+            if (status) status.textContent = `Subiendo ${file.name}… (${done + 1}/${total})`;
             try {
                 await API.uploadFile(file, folderId);
                 done++;
             } catch (err) {
-                alert(`Failed to upload "${file.name}": ${err.message}`);
+                alert(`Error al subir "${file.name}": ${err.message}`);
             }
         }
 
         if (status) status.textContent = done === total
-            ? `${done} file(s) uploaded successfully.`
-            : `${done}/${total} files uploaded.`;
+            ? `${done} archivo${done === 1 ? '' : 's'} subido${done === 1 ? '' : 's'} correctamente.`
+            : `${done}/${total} archivos subidos.`;
 
         return done;
     }
