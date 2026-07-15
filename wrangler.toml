@@ -1,7 +1,5 @@
-{
-  "name": "ligth-secret-drive",
-  "compatibility_date": "2026-07-15",
-  "assets": {
-    "directory": "./public"
-  }
-}
+name = "ligth-secret-drive"
+compatibility_date = "2026-07-15"
+
+[assets]
+directory = "./public"
