@@ -15,7 +15,7 @@
     submitBtn.addEventListener('click', async () => {
         errorDiv.style.display = 'none';
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Connecting…';
+        submitBtn.textContent = 'Conectando…';
 
         try {
             await API.loginWithGoogle();
@@ -29,10 +29,10 @@
                 window.location.href = '/explorer.html';
             }
         } catch (error) {
-            showError(error.message || 'Could not connect to Google Drive.');
+            showError(error.message || 'No se pudo conectar a Google Drive.');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Continue with Google';
+            submitBtn.textContent = 'Continuar con Google';
         }
     });
 })();

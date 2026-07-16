@@ -21,10 +21,10 @@
 
     if (isInit) {
         logo.textContent = '🔑';
-        title.textContent = 'Create Vault';
-        subtitle.textContent = 'Choose a strong master password. It cannot be recovered.';
+        title.textContent = 'Crear carpeta encriptada';
+        subtitle.textContent = 'Elige una contraseña maestra segura y guardela bien. NO PUEDE SER RECUPERADA.';
         confirmGroup.style.display = 'block';
-        submitBtn.textContent = 'Create Vault';
+        submitBtn.textContent = 'Crear carpeta';
     }
 
     function showError(msg) {
@@ -36,25 +36,24 @@
         e.preventDefault();
         errorDiv.style.display = 'none';
         submitBtn.disabled = true;
-        submitBtn.textContent = isInit ? 'Creating…' : 'Unlocking…';
+        submitBtn.textContent = isInit ? 'Creando…' : 'Abriendo…';
 
         const password = document.getElementById('password').value;
         const confirm = document.getElementById('confirm').value;
 
         try {
             if (isInit) {
-                if (password.length < 12) { showError('Password must be at least 12 characters.'); return; }
-                if (password !== confirm) { showError('Passwords do not match.'); return; }
+                if (password !== confirm) { showError('Las contraseñas no coinciden.'); return; }
                 await API.initVault(password, confirm);
             } else {
                 await API.unlockVault(password);
             }
             window.location.href = '/explorer.html';
         } catch (err) {
-            showError(err.message || 'Operation failed. Please try again.');
+            showError(err.message || 'La operación falló. Por favor, inténtalo de nuevo.');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = isInit ? 'Create Vault' : 'Unlock';
+            submitBtn.textContent = isInit ? 'Crear carpeta' : 'Abrir';
         }
     });
 

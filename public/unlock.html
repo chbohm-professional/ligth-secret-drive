@@ -10,26 +10,26 @@
 <body class="auth-page">
     <div class="auth-card" id="unlockCard">
         <div class="auth-logo" id="authLogo">🔐</div>
-        <h1 class="auth-title" id="authTitle">Unlock Vault</h1>
-        <p class="auth-subtitle" id="authSubtitle">Enter your master password to unlock your locally encrypted vault.</p>
+        <h1 class="auth-title" id="authTitle">Acceder a la carpeta encriptada</h1>
+        <p class="auth-subtitle" id="authSubtitle">Ingresa tu contraseña maestra para acceder a tu carpeta encriptada.</p>
 
         <form id="unlockForm" class="auth-form">
             <div class="form-group">
-                <label for="password">Master Password</label>
+                <label for="password">Contraseña maestra</label>
                 <input type="password" id="password" name="password" autocomplete="current-password"
-                       placeholder="Enter master password" required autofocus>
+                       placeholder="Ingresa tu contraseña maestra" required autofocus>
             </div>
             <!-- Only shown when action=init -->
             <div class="form-group" id="confirmGroup" style="display:none">
-                <label for="confirm">Confirm Password</label>
+                <label for="confirm">Confirmar contraseña</label>
                 <input type="password" id="confirm" name="confirm" autocomplete="new-password"
-                       placeholder="Confirm master password">
+                       placeholder="Confirma tu contraseña maestra" required>
             </div>
             <div id="formError" class="form-error" style="display:none"></div>
-            <button type="submit" class="btn btn-primary" id="submitBtn">Unlock</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Abrir</button>
         </form>
         <div class="auth-links">
-            <a href="#" id="logoutLink">Use a different local profile</a>
+            <a href="#" id="logoutLink">Usa un perfil local diferente</a>
         </div>
     </div>
     <script src="/js/app-config.js"></script>
