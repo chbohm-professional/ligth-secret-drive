@@ -373,3 +373,45 @@ body {
     width: 100%;
     text-align: left;
 }
+
+
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 45px; /* espacio para el ojo */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    background: #252535; /* mismo color del fondo */
+    border: none;
+    padding: 4px;
+
+    cursor: pointer;
+
+    color: white;
+    font-size: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-toggle i {
+    color: white;
+}
+
+.password-toggle:hover i {
+    color: #ddd;
+}

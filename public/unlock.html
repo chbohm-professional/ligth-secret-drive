@@ -5,36 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abrir carpeta</title>
     <link rel="stylesheet" href="/css/style.css">
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
+
 <body class="auth-page">
+
     <div class="auth-card" id="unlockCard">
+
         <div class="auth-logo" id="authLogo">🔐</div>
-        <h1 class="auth-title" id="authTitle">Acceder a la carpeta encriptada</h1>
-        <p class="auth-subtitle" id="authSubtitle">Ingresa tu contraseña maestra para acceder a tu carpeta encriptada.</p>
+
+        <h1 class="auth-title" id="authTitle">
+            Acceder a la carpeta encriptada
+        </h1>
+
+        <p class="auth-subtitle" id="authSubtitle">
+            Ingresa tu contraseña maestra para acceder a tu carpeta encriptada.
+        </p>
+
 
         <form id="unlockForm" class="auth-form">
+
             <div class="form-group">
                 <label for="password">Contraseña maestra</label>
-                <input type="password" id="password" name="password" autocomplete="current-password"
-                       placeholder="Ingresa tu contraseña maestra" required autofocus>
-            </div> 
+
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        autocomplete="current-password"
+                        placeholder="Ingresa tu contraseña maestra" 
+                        required 
+                        autofocus>
+
+                    <button type="button" class="password-toggle">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+
             <!-- Only shown when action=init -->
             <div class="form-group" id="confirmGroup" style="display:none">
+
                 <label for="confirm">Confirmar contraseña</label>
-                <input type="password" id="confirm" name="confirm" autocomplete="new-password"
-                       placeholder="Confirma tu contraseña maestra">
+
+                <div class="password-wrapper">
+                    <input 
+                        type="password" 
+                        id="confirm" 
+                        name="confirm" 
+                        autocomplete="new-password"
+                        placeholder="Confirma tu contraseña maestra">
+
+                    <button type="button" class="password-toggle">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+
             </div>
+
+
             <div id="formError" class="form-error" style="display:none"></div>
-            <button type="submit" class="btn btn-primary" id="submitBtn">Abrir</button>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                Abrir
+            </button>
+
         </form>
+
+
         <div class="auth-links">
-            <a href="#" id="logoutLink">Usa un perfil local diferente</a>
+            <a href="#" id="logoutLink">
+                Usa un perfil local diferente
+            </a>
         </div>
+
     </div>
+
+
     <script src="/js/app-config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/unlock.js"></script>
+
+
+    <script>
+        document.querySelectorAll(".password-toggle").forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                const input = button.parentElement.querySelector("input");
+                const icon = button.querySelector("i");
+
+                if (input.type === "password") {
+
+                    input.type = "text";
+
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+
+                } else {
+
+                    input.type = "password";
+
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+
+                }
+
+            });
+
+        });
+    </script>
+
 </body>
 </html>

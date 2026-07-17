@@ -32,8 +32,40 @@
         errorDiv.style.display = 'block';
     }
 
+
+    // Mostrar / ocultar contraseñas
+    document.querySelectorAll(".password-toggle").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const wrapper = button.closest(".password-wrapper");
+            const input = wrapper.querySelector("input");
+            const icon = button.querySelector("i");
+
+            if (input.type === "password") {
+
+                input.type = "text";
+
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+
+            } else {
+
+                input.type = "password";
+
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+
+            }
+
+        });
+
+    });
+
+
     document.getElementById('unlockForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+
         errorDiv.style.display = 'none';
         submitBtn.disabled = true;
         submitBtn.textContent = isInit ? 'Creando…' : 'Abriendo…';
@@ -42,24 +74,48 @@
         const confirm = document.getElementById('confirm').value;
 
         try {
+
             if (isInit) {
-                if (password !== confirm) { showError('Las contraseñas no coinciden.'); return; }
+
+                if (password !== confirm) {
+                    showError('Las contraseñas no coinciden.');
+                    return;
+                }
+
                 await API.initVault(password, confirm);
+
             } else {
+
                 await API.unlockVault(password);
+
             }
+
             window.location.href = '/explorer.html';
+
         } catch (err) {
+
             showError(err.message || 'La operación falló. Por favor, inténtalo de nuevo.');
+
         } finally {
+
             submitBtn.disabled = false;
             submitBtn.textContent = isInit ? 'Crear carpeta' : 'Abrir';
+
         }
+
     });
 
+
     logoutLink.addEventListener('click', async (e) => {
+
         e.preventDefault();
-        try { await API.logout(); } catch {}
+
+        try {
+            await API.logout();
+        } catch {}
+
         window.location.href = '/login.html';
+
     });
+
 })();
