@@ -10,7 +10,7 @@
 const API = (() => {
     const APP_CONFIG = window.APP_CONFIG || {};
     const GOOGLE_CLIENT_ID = APP_CONFIG.googleClientId || '';
-    const VAULT_ROOT_NAME = APP_CONFIG.vaultFolderName || 'Encrypted Vault';
+    const VAULT_ROOT_NAME = APP_CONFIG.vaultFolderName || 'Carpeta cifrada';
     const GOOGLE_SCOPES = [
         'openid',
         'email',
@@ -450,7 +450,7 @@ const API = (() => {
     async function requireUnlockedUser() {
         const user = await requireCurrentUser();
         const keyBytes = getUnlockedKey(user.id);
-        if (!keyBytes) fail('Vault is locked.');
+        if (!keyBytes) fail('La carpeta está bloqueada.');
         return { user, keyBytes };
     }
 
@@ -686,8 +686,7 @@ const API = (() => {
     async function initVault(password, confirm) {
         const user = await requireCurrentUser();
         if (password !== confirm) fail('Passwords do not match.');
-        if (password.length < 12) fail('Password must be at least 12 characters.');
-        if (await getVaultConfig(user.id)) fail('Vault already initialized.');
+        if (await getVaultConfig(user.id)) fail('La carpeta ya está inicializada.');
 
         const salt = crypto.getRandomValues(new Uint8Array(32));
         const { keyBytes, verifier } = await deriveKeyAndVerifier(password, bytesToBase64(salt), DEFAULT_ITERATIONS);
@@ -725,26 +724,26 @@ const API = (() => {
         await saveVaultIndex(user, keyBytes, index);
         setUnlockedKey(user.id, keyBytes);
 
-        return ok(null, 'Vault initialized');
+        return ok(null, 'Carpeta inicializada');
     }
 
     async function unlockVault(password) {
         const user = await requireCurrentUser();
         const config = await getVaultConfig(user.id);
-        if (!config) fail('Vault is not initialized yet.');
+        if (!config) fail('La carpeta no está inicializada aún.');
 
         const { keyBytes, verifier } = await deriveKeyAndVerifier(password, config.salt, config.iterations || DEFAULT_ITERATIONS);
-        if (verifier !== config.passwordVerifier) fail('Wrong master password');
+        if (verifier !== config.passwordVerifier) fail('Contraseña maestra incorrecta');
         setUnlockedKey(user.id, keyBytes);
         await loadVaultIndex(user, keyBytes);
-        return ok(null, 'Vault unlocked');
+        return ok(null, 'Carpeta desbloqueada');
     }
 
     async function lockVault() {
         const user = await requireCurrentUser();
         clearUnlockedKey(user.id);
         clearVaultIndexCache(user.id);
-        return ok(null, 'Vault locked');
+        return ok(null, 'Carpeta bloqueada');
     }
 
     async function selectDriveFolder(folderId, folderName) {

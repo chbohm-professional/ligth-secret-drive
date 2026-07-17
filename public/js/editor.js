@@ -23,7 +23,7 @@
     const charEl     = document.getElementById('charCount');
 
     nameEl.textContent = fileName;
-    document.title     = `${fileName} — Vault`;
+    document.title     = `${fileName} — Carpeta cifrada`;
 
     // ── Load content ────────────────────────────────────────────────────
     try {
@@ -53,15 +53,15 @@
         if (content === lastSaved) { isDirty = false; return; }
 
         isSaving = true;
-        setStatus('💾 Saving…', 'saving');
+        setStatus('💾 Guardando…', 'saving');
         try {
             await API.updateFileContent(fileId, content);
             lastSaved = content;
             isDirty   = false;
-            setStatus('✓ Saved', 'saved');
+            setStatus('✓ Guardado', 'saved');
             setTimeout(() => { if (!isDirty) setStatus(''); }, 2500);
         } catch (err) {
-            setStatus('⚠ Save failed — ' + err.message, 'error');
+            setStatus('⚠ Error al guardar — ' + err.message, 'error');
         } finally {
             isSaving = false;
         }
