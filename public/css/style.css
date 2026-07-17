@@ -338,3 +338,38 @@ body {
 .folder-picker-item { padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .folder-picker-item:hover { background: var(--hover); }
 .folder-picker-item.selected { background: var(--selected); }
+
+
+/* ── Toolbar ────────────────────────────────────────── */
+.header-menu {
+    display: flex;
+    align-items: center;
+}
+
+.burger-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.toolbar-modal {
+    width: 280px;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+}
+
+.toolbar-dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+}
+
+.toolbar-dialog-body .toolbar-btn {
+    width: 100%;
+    text-align: left;
+}

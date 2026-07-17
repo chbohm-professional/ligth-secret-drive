@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body class="explorer-page">
 
     <!-- Header -->
@@ -15,24 +17,9 @@
             <span class="header-logo">🔒</span>
             <span class="header-title">Drive cifrado</span>
         </div>
-        <div class="header-toolbar">
-            <button class="toolbar-btn" id="btnFolders" title="Seleccionar carpeta">
-                🗂 Carpetas
-            </button>
-            <button class="toolbar-btn" id="btnUpload" title="Subir archivos">
-                ⬆ Subir
-            </button>
-            <button class="toolbar-btn" id="btnNewFolder" title="Crear carpeta">
-                📁 Nueva carpeta
-            </button>
-            <button class="toolbar-btn" id="btnNewDoc" title="Crear documento">
-                📝 Nuevo documento
-            </button>
-            <button class="toolbar-btn" id="btnDownload" title="Descargar seleccionados" disabled>
-                ⬇ Descargar
-            </button>
-            <button class="toolbar-btn btn-danger" id="btnDelete" title="Eliminar seleccionados" disabled>
-                🗑 Eliminar
+        <div class="header-menu">
+            <button class="burger-btn" id="btnBurger" title="Menú">
+                ☰
             </button>
         </div>
         <div class="header-right">
@@ -88,6 +75,44 @@
         </div>
     </div>
 
+
+    <div class="modal-overlay" id="toolbarOverlay" style="display:none">
+        <div class="modal toolbar-modal">
+            <div class="modal-header">
+                <span>Opciones</span>
+                <button class="modal-close" id="toolbarClose">✕</button>
+            </div>
+
+            <div class="toolbar-dialog-body">
+
+                <button class="toolbar-btn" id="btnFolders">
+                    🗂 Carpetas
+                </button>
+
+                <button class="toolbar-btn" id="btnUpload">
+                    ⬆ Subir
+                </button>
+
+                <button class="toolbar-btn" id="btnNewFolder">
+                    📁 Nueva carpeta
+                </button>
+
+                <button class="toolbar-btn" id="btnNewDoc">
+                    📝 Nuevo documento
+                </button>
+
+                <button class="toolbar-btn" id="btnDownload" disabled>
+                    ⬇ Descargar
+                </button>
+
+                <button class="toolbar-btn btn-danger" id="btnDelete" disabled>
+                    🗑 Eliminar
+                </button>
+
+            </div>
+        </div>
+    </div>
+
     <script src="/js/app-config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -95,6 +120,8 @@
     <script src="/js/folders.js"></script>
     <script src="/js/files.js"></script>
     <script src="/js/upload.js"></script>
+    <script src="/js/toolbar.js"></script>
     <script src="/js/explorer.js"></script>
 </body>
+
 </html>
