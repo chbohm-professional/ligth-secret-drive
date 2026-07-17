@@ -32,8 +32,8 @@ const API = (() => {
 
     let googleReadyPromise = null;
     let tokenClient = null;
-    let accessToken = sessionStorage.getItem(LOCAL_TOKEN_KEY) || '';
-    let accessTokenExpiry = Number(sessionStorage.getItem(LOCAL_TOKEN_EXPIRY_KEY) || 0);
+    let accessToken = localStorage.getItem(LOCAL_TOKEN_KEY) || '';
+    let accessTokenExpiry = Number(localStorage.getItem(LOCAL_TOKEN_EXPIRY_KEY) || 0);
     let activeUser = readStoredUser();
     let tokenRequestPromise = null;
     const vaultContextCache = new Map();
@@ -76,15 +76,15 @@ const API = (() => {
     function storeAccessToken(token, expiresInSeconds) {
         accessToken = token;
         accessTokenExpiry = Date.now() + Math.max((expiresInSeconds - 60) * 1000, 60 * 1000);
-        sessionStorage.setItem(LOCAL_TOKEN_KEY, accessToken);
-        sessionStorage.setItem(LOCAL_TOKEN_EXPIRY_KEY, String(accessTokenExpiry));
+        localStorage.setItem(LOCAL_TOKEN_KEY, accessToken);
+        localStorage.setItem(LOCAL_TOKEN_EXPIRY_KEY, String(accessTokenExpiry));
     }
 
     function clearAccessToken() {
         accessToken = '';
         accessTokenExpiry = 0;
-        sessionStorage.removeItem(LOCAL_TOKEN_KEY);
-        sessionStorage.removeItem(LOCAL_TOKEN_EXPIRY_KEY);
+        localStorage.removeItem(LOCAL_TOKEN_KEY);
+        localStorage.removeItem(LOCAL_TOKEN_EXPIRY_KEY);
     }
 
     let CLIENT_ID;
@@ -241,7 +241,7 @@ const API = (() => {
                 tokenClient = window.google.accounts.oauth2.initTokenClient({
                     client_id: CLIENT_ID,
                     scope: GOOGLE_SCOPES,
-                    callback: () => {},
+                    callback: () => { },
                     error_callback: (error) => reject(error),
                 });
                 resolve();
@@ -283,8 +283,13 @@ const API = (() => {
     }
 
     async function requireDriveToken() {
-        if (accessToken && Date.now() < accessTokenExpiry) return accessToken;
-        fail('Google session expired. Sign in again.');
+        if (accessToken && Date.now() < accessTokenExpiry) {
+            return accessToken;
+        }
+
+        await requestAccessToken('');
+
+        return accessToken;
     }
 
     async function driveFetch(url, options = {}) {
@@ -305,7 +310,7 @@ const API = (() => {
             try {
                 const payload = await response.json();
                 message = payload.error?.message || payload.message || message;
-            } catch {}
+            } catch { }
             fail(message);
         }
 
@@ -409,7 +414,7 @@ const API = (() => {
 
     async function loginWithGoogle() {
         clearAccessToken();
-        await requestAccessToken('select_account consent');
+        await requestAccessToken('');
         const profile = await fetchGoogleProfile();
 
         const user = await persistUserProfile({
@@ -989,7 +994,7 @@ const API = (() => {
         return ok(updated);
     }
 
-    const ccb='Y2NiZXdvZ0lDQWdJbmRsWWlJNklIc0tJQ0FnSUNBZ0lDQWlZMnhwWlc1MFgybGtJam9nSWpjeE1EZzRORE01TlRrMUxUbHROemhpYTNadmNHd3ljek5rWlRGcGNERXhOR2xqYlRRMk1YSnhOakJ6TG1Gd2NITXVaMjl2WjJ4bGRYTmxjbU52Ym5SbGJuUXVZMjl0SWl3S0lDQWdJQ0FnSUNBaWNISnZhbVZqZEY5cFpDSTZJQ0p6WldOeVpYUXRaSEpwZG1VaUxBb2dJQ0FnSUNBZ0lDSmhkWFJvWDNWeWFTSTZJQ0pvZEhSd2N6b3ZMMkZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjB2Ynk5dllYVjBhREl2WVhWMGFDSXNDaUFnSUNBZ0lDQWdJblJ2YTJWdVgzVnlhU0k2SUNKb2RIUndjem92TDI5aGRYUm9NaTVuYjI5bmJHVmhjR2x6TG1OdmJTOTBiMnRsYmlJc0NpQWdJQ0FnSUNBZ0ltRjFkR2hmY0hKdmRtbGtaWEpmZURVd09WOWpaWEowWDNWeWJDSTZJQ0pvZEhSd2N6b3ZMM2QzZHk1bmIyOW5iR1ZoY0dsekxtTnZiUzl2WVhWMGFESXZkakV2WTJWeWRITWlMQW9nSUNBZ0lDQWdJQ0pqYkdsbGJuUmZjMlZqY21WMElqb2dJa2RQUTFOUVdDMXNiV0ZPU1VSbVdsSmFjRWRwYUd0WWNHSjJjbmQyV25ZMVRUSnZJaXdLSUNBZ0lDQWdJQ0FpYW1GMllYTmpjbWx3ZEY5dmNtbG5hVzV6SWpvZ1d3b2dJQ0FnSUNBZ0lDQWdJQ0FpYUhSMGNEb3ZMMnh2WTJGc2FHOXpkRG8wTVRjeklnb2dJQ0FnSUNBZ0lGMEtJQ0FnSUgwS2ZR'
+    const ccb = 'Y2NiZXdvZ0lDQWdJbmRsWWlJNklIc0tJQ0FnSUNBZ0lDQWlZMnhwWlc1MFgybGtJam9nSWpjeE1EZzRORE01TlRrMUxUbHROemhpYTNadmNHd3ljek5rWlRGcGNERXhOR2xqYlRRMk1YSnhOakJ6TG1Gd2NITXVaMjl2WjJ4bGRYTmxjbU52Ym5SbGJuUXVZMjl0SWl3S0lDQWdJQ0FnSUNBaWNISnZhbVZqZEY5cFpDSTZJQ0p6WldOeVpYUXRaSEpwZG1VaUxBb2dJQ0FnSUNBZ0lDSmhkWFJvWDNWeWFTSTZJQ0pvZEhSd2N6b3ZMMkZqWTI5MWJuUnpMbWR2YjJkc1pTNWpiMjB2Ynk5dllYVjBhREl2WVhWMGFDSXNDaUFnSUNBZ0lDQWdJblJ2YTJWdVgzVnlhU0k2SUNKb2RIUndjem92TDI5aGRYUm9NaTVuYjI5bmJHVmhjR2x6TG1OdmJTOTBiMnRsYmlJc0NpQWdJQ0FnSUNBZ0ltRjFkR2hmY0hKdmRtbGtaWEpmZURVd09WOWpaWEowWDNWeWJDSTZJQ0pvZEhSd2N6b3ZMM2QzZHk1bmIyOW5iR1ZoY0dsekxtTnZiUzl2WVhWMGFESXZkakV2WTJWeWRITWlMQW9nSUNBZ0lDQWdJQ0pqYkdsbGJuUmZjMlZqY21WMElqb2dJa2RQUTFOUVdDMXNiV0ZPU1VSbVdsSmFjRWRwYUd0WWNHSjJjbmQyV25ZMVRUSnZJaXdLSUNBZ0lDQWdJQ0FpYW1GMllYTmpjbWx3ZEY5dmNtbG5hVzV6SWpvZ1d3b2dJQ0FnSUNBZ0lDQWdJQ0FpYUhSMGNEb3ZMMnh2WTJGc2FHOXpkRG8wTVRjeklnb2dJQ0FnSUNBZ0lGMEtJQ0FnSUgwS2ZR'
 
     async function createTextFile(name, folderId) {
         const file = new File(['<p><br></p>'], name, { type: 'text/html' });
